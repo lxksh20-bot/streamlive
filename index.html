@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CricLive — Live Sports Streaming</title>
+<title>StreamLive — Premium Sports Streaming</title>
 <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -18,50 +18,23 @@
   .orb2 { width:500px; height:500px; background:radial-gradient(circle,rgba(34,158,217,0.08),transparent 70%); bottom:-100px; right:-100px; }
 
   /* Main Container */
-  .container { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:40px 20px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  .container { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:40px 20px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
   
   /* Header */
-  .logo { font-family:'Teko',sans-serif; font-size:clamp(3rem, 8vw, 4.5rem); font-weight:700; letter-spacing:4px; line-height:1; margin-bottom:5px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+  .logo { font-family:'Teko',sans-serif; font-size:clamp(3.5rem, 10vw, 5.5rem); font-weight:700; letter-spacing:4px; line-height:1; margin-bottom:5px; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
   .logo span { background:linear-gradient(135deg,#ff4444,#ff8c42); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .tagline { font-size:1rem; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:40px; font-weight:600; }
-
-  /* Glassmorphism Card */
-  .glass-card { width:100%; background:rgba(15, 15, 15, 0.4); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.05); border-radius:24px; padding:30px; box-shadow:0 30px 60px rgba(0,0,0,0.6); margin-bottom:30px; }
-  
-  .card-header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px; margin-bottom:20px; }
-  .card-title { font-family:'Teko',sans-serif; font-size:1.8rem; letter-spacing:2px; color:#fff; display:flex; align-items:center; gap:10px; }
-  
-  .live-pulse { display:flex; align-items:center; gap:6px; background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.2); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; letter-spacing:2px; color:#ff6666; text-transform:uppercase; }
-  .pulse-dot { width:6px; height:6px; background:#ff4444; border-radius:50%; animation:pulse 1.2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 8px #ff4444;} 50%{opacity:0.3;box-shadow:none;} }
-
-  /* Match List */
-  .match-list { display:flex; flex-direction:column; gap:12px; }
-  .match-item { display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.03); padding:16px 20px; border-radius:16px; text-decoration:none; color:#fff; transition:all 0.3s ease; }
-  .match-item:hover { transform:translateY(-3px); background:rgba(34,158,217,0.05); border-color:rgba(34,158,217,0.3); box-shadow:0 10px 20px rgba(0,0,0,0.4); }
-  
-  .match-info { display:flex; flex-direction:column; gap:4px; }
-  .match-teams { font-size:1.2rem; font-weight:700; letter-spacing:1px; }
-  .match-tourney { font-size:0.8rem; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; }
-  
-  .watch-btn { background:linear-gradient(135deg,#ff4444,#cc2222); color:#fff; padding:8px 20px; border-radius:10px; font-family:'Teko',sans-serif; font-size:1.1rem; letter-spacing:2px; text-transform:uppercase; transition:box-shadow 0.2s; }
-  .match-item:hover .watch-btn { box-shadow:0 0 15px rgba(255,68,68,0.4); }
+  .tagline { font-size:1.1rem; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:50px; font-weight:600; text-align:center; }
 
   /* Main Telegram Button */
-  .tg-banner { width:100%; display:flex; flex-direction:column; align-items:center; background:linear-gradient(135deg, rgba(34,158,217,0.1), rgba(26,127,181,0.05)); border:1px solid rgba(34,158,217,0.2); border-radius:24px; padding:30px; text-align:center; transition:transform 0.3s; }
-  .tg-banner:hover { transform:translateY(-3px); border-color:rgba(34,158,217,0.4); }
-  .tg-title { font-family:'Teko',sans-serif; font-size:1.8rem; letter-spacing:1px; margin-bottom:5px; }
-  .tg-sub { font-size:0.9rem; color:rgba(255,255,255,0.5); margin-bottom:20px; }
+  .tg-banner { width:100%; max-width:600px; display:flex; flex-direction:column; align-items:center; background:linear-gradient(135deg, rgba(34,158,217,0.1), rgba(26,127,181,0.05)); border:1px solid rgba(34,158,217,0.2); border-radius:24px; padding:40px 30px; text-align:center; transition:transform 0.3s; box-shadow:0 20px 50px rgba(0,0,0,0.5); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .tg-banner:hover { transform:translateY(-5px); border-color:rgba(34,158,217,0.4); }
+  .tg-title { font-family:'Teko',sans-serif; font-size:2.2rem; letter-spacing:1px; margin-bottom:12px; }
+  .tg-sub { font-size:1rem; color:rgba(255,255,255,0.6); margin-bottom:30px; line-height:1.6; }
   
-  .tg-btn { display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,#229ed9,#1a7fb5); color:#fff; padding:14px 36px; border-radius:12px; font-family:'Teko',sans-serif; font-size:1.3rem; letter-spacing:2px; text-decoration:none; text-transform:uppercase; box-shadow:0 8px 30px rgba(34,158,217,0.3); transition:all 0.2s; }
+  .tg-btn { display:inline-flex; align-items:center; gap:12px; background:linear-gradient(135deg,#229ed9,#1a7fb5); color:#fff; padding:16px 40px; border-radius:12px; font-family:'Teko',sans-serif; font-size:1.5rem; letter-spacing:2px; text-decoration:none; text-transform:uppercase; box-shadow:0 8px 30px rgba(34,158,217,0.3); transition:all 0.2s; }
   .tg-btn:hover { transform:scale(1.03); box-shadow:0 12px 40px rgba(34,158,217,0.5); }
 
-  footer { margin-top:auto; padding-top:40px; font-size:0.75rem; color:rgba(255,255,255,0.2); letter-spacing:2px; text-transform:uppercase; }
-
-  @media(max-width: 600px) {
-    .match-item { flex-direction:column; align-items:flex-start; gap:15px; }
-    .watch-btn { width:100%; text-align:center; }
-  }
+  footer { position:absolute; bottom:20px; font-size:0.75rem; color:rgba(255,255,255,0.2); letter-spacing:2px; text-transform:uppercase; }
 </style>
 </head>
 <body>
@@ -71,47 +44,22 @@
 
 <div class="container">
   
-  <div class="logo">Cric<span>Live</span></div>
+  <div class="logo">Stream<span>Live</span></div>
   <div class="tagline">Premium Sports Streaming</div>
-
-  <div class="glass-card">
-    <div class="card-header">
-      <div class="card-title">🏆 Today's Matches</div>
-      <div class="live-pulse"><div class="pulse-dot"></div> Live</div>
-    </div>
-    
-    <div class="match-list">
-      <a href="t20indvspak.html" class="match-item">
-        <div class="match-info">
-          <div class="match-teams">India vs Pakistan</div>
-          <div class="match-tourney">ICC T20 World Cup</div>
-        </div>
-        <div class="watch-btn">▶ Watch Live</div>
-      </a>
-      
-      <a href="#" class="match-item">
-        <div class="match-info">
-          <div class="match-teams">Australia vs England</div>
-          <div class="match-tourney">The Ashes Test</div>
-        </div>
-        <div class="watch-btn">▶ Watch Live</div>
-      </a>
-    </div>
-  </div>
 
   <div class="tg-banner">
     <div class="tg-title">Never Miss A Match</div>
-    <div class="tg-sub">Get direct HD stream links 15 minutes before every match starts.</div>
-    <a href="https://t.me/YOUR_CHANNEL" class="tg-btn" target="_blank">
+    <div class="tg-sub">Join our Telegram channel to get direct HD stream links 15 minutes before every match starts.</div>
+    <a href="https://t.me/+uRfBrtl9y0g5NmU5" class="tg-btn" target="_blank">
       <span>✈️</span> Join Telegram Channel
     </a>
   </div>
 
-  <footer>CricLive © 2025</footer>
+  <footer>StreamLive © 2026</footer>
 </div>
 
 <script>
-// Keep the cool background stars
+// Animated background stars
 const s = document.getElementById('stars');
 for(let i=0; i<100; i++){
   const el = document.createElement('div');
