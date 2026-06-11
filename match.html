@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream — StreamLive</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.6/shaka-player.compiled.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ── Core Reset & Theme ── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { background: #030303; color: #ffffff; font-family: 'Rajdhani', sans-serif; min-height: 100vh; overflow-x: hidden; }
+        
+        .ambient-glow { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(255, 68, 68, 0.04), transparent 70%); top: -200px; right: -100px; border-radius: 50%; pointer-events: none; z-index: 0; }
+        .container { max-width: 1040px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+
+        /* ── Header / Navigation ── */
+        .nav-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .back-btn { display: flex; align-items: center; gap: 8px; color: #888; text-decoration: none; font-size: 1rem; font-weight: 600; transition: color 0.2s; background: #0d0d0d; border: 1px solid #1a1a1a; padding: 8px 16px; border-radius: 30px; }
+        .back-btn:hover { color: #fff; border-color: #ff4444; }
+        .brand-logo { font-family: 'Teko'; font-size: 2.2rem; letter-spacing: 1px; text-decoration: none; color: #fff; line-height: 1; }
+        .brand-logo span { color: #ff4444; }
+
+        /* ── Match Info Area ── */
+        .match-meta { background: #0a0a0a; border: 1px solid #141414; border-radius: 16px; padding: 20px 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .meta-left { display: flex; flex-direction: column; }
+        .m-title { font-family: 'Teko'; font-size: 2.6rem; font-weight: 600; line-height: 1.1; letter-spacing: 0.5px; text-transform: uppercase; }
+        .m-sub { color: #8c8c8c; font-size: 1.1rem; font-weight: 500; margin-top: 4px; display: flex; align-items: center; gap: 8px; }
+        .m-sub::before { content: "•"; color: #ff4444; font-size: 1.5rem; line-height: 1; }
+
+        /* ── Custom Cinematic Video Player Stage ── */
+        .player-stage { background: #000; aspect-ratio: 16/9; border: 1px solid #1a1a1a; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; margin-bottom: 20px; }
+        #vid { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Custom Control Overlay Over Video */
+        .player-controls { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.95)); padding: 20px; display: flex; align-items: center; justify-content: space-between; opacity: 0; transition: opacity 0.3s; z-index: 10; }
+        .player-stage:hover .player-controls { opacity: 1; }
+        
+        .ctrl-left, .ctrl-right { display: flex; align-items: center; gap: 16px; }
+        .ctrl-btn { background: none; border: none; color: #fff; font-size: 1.3rem; cursor: pointer; transition: color 0.2s; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; }
+        .ctrl-btn:hover { color: #ff4444; background: rgba(255,255,255,0.05); }
+
+        /* Live Tracker Status badge */
+        .live-indicator { display: flex; align-items: center; gap: 6px; font-weight: 700; color: #ff4444; font-size: 0.9rem; letter-spacing: 1px; margin-left: 8px; }
+        .pulse-dot { width: 8px; height: 8px; background: #ff4444; border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); } 70% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 0 8px rgba(255, 68, 68, 0); } 100% { transform: scale(0.9); opacity: 1; box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); } }
+
+        /* Custom Dropdown Quality Menu */
+        .quality-menu-wrap { position: relative; }
+        .quality-select-btn { background: #111; border: 1px solid #333; color: #fff; padding: 6px 12px; border-radius: 6px; font-family: 'Rajdhani'; font-weight: 600; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .quality-select-btn:hover { border-color: #ff4444; }
+        .quality-dropdown { position: absolute; bottom: 45px; right: 0; background: #0d0d0d; border: 1px solid #222; border-radius: 8px; overflow: hidden; width: 110px; display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 20; }
+        .quality-dropdown.show { display: block; }
+        .quality-opt { width: 100%; background: none; border: none; color: #aaa; padding: 8px 12px; text-align: left; font-family: 'Rajdhani'; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+        .quality-opt:hover { background: #ff4444; color: #fff; }
+        .quality-opt.active { color: #ff4444; font-weight: 700; }
+        .quality-opt.active:hover { color: #fff; }
+
+        /* ── Telegram Multiplier Banner ── */
+        .tg-banner { background: linear-gradient(90deg, #0b1a24 0%, #071118 100%); border: 1px solid #112836; border-radius: 16px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .tg-left { display: flex; align-items: center; gap: 16px; }
+        .tg-icon { width: 48px; height: 48px; background: #229ed9; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.6rem; box-shadow: 0 4px 12px rgba(34, 158, 217, 0.3); }
+        .tg-info h4 { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .tg-info p { color: #769cb3; font-size: 0.95rem; font-weight: 500; }
+        .tg-action-btn { background: #229ed9; color: #fff; font-family: 'Rajdhani'; font-weight: 700; font-size: 1.05rem; text-decoration: none; padding: 12px 28px; border-radius: 10px; transition: background 0.2s, display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(34, 158, 217, 0.4); }
+        .tg-action-btn:hover { background: #1da1f2; }
+
+        /* Loading & Error Overlays */
+        .status-overlay { position: absolute; inset: 0; background: #050505; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; z-index: 5; }
+        .status-overlay h3 { font-family: 'Teko'; font-size: 2.5rem; margin-bottom: 6px; }
+        .status-overlay p { color: #888; font-weight: 500; max-width: 400px; }
+        #errorBox { display: none; background: #0a0a0a; }
+        #errorBox h3 { color: #ff4444; }
+        
+        /* Spinner animation */
+        .spinner { border: 3px solid rgba(255, 68, 68, 0.1); border-radius: 50%; border-top: 3px solid #ff4444; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <header class="nav-header">
+            <a href="index.html" class="back-btn">← Back to Home</a>
+            <a href="index.html" class="brand-logo">STREAM<span>LIVE</span></a>
+        </header>
+
+        <main>
+            <div class="match-meta">
+                <div class="meta-left">
+                    <h1 class="m-title" id="pageTitle">Loading Stream...</h1>
+                    <div class="m-sub" id="pageSub">Fetching dynamic stream properties</div>
+                </div>
+            </div>
+
+            <div class="player-stage">
+                
+                <video id="vid" playsinline autoplay></video>
+
+                <div class="status-overlay" id="loadingBox">
+                    <div class="spinner"></div>
+                    <h3>CONNECTING TO BROADCAST</h3>
+                    <p>Resolving network manifests and verifying encryption keys...</p>
+                </div>
+                
+                <div class="status-overlay" id="errorBox">
+                    <h3>FEED OFFLINE</h3>
+                    <p id="errorTxt">The streaming payload could not be mounted securely.</p>
+                </div>
+
+                <div class="player-controls" id="customControls">
+                    <div class="ctrl-left">
+                        <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">⏸</button>
+                        <button class="ctrl-btn" id="muteBtn" title="Mute/Unmute">🔊</button>
+                        <div class="live-indicator">
+                            <div class="pulse-dot"></div>
+                            <span>LIVE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ctrl-right">
+                        <button class="ctrl-btn" id="refreshStreamBtn" title="Refresh/Reconnect Feed" style="font-size:1.1rem;">🔄</button>
+                        
+                        <div class="quality-menu-wrap">
+                            <button class="quality-select-btn" id="qualityMenuBtn">
+                                ⚙ <span id="currentQualityLabel">Auto</span>
+                            </button>
+                            <div class="quality-dropdown" id="qualityDropdownMenu">
+                                </div>
+                        </div>
+
+                        <button class="ctrl-btn" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tg-banner">
+                <div class="tg-left">
+                    <div class="tg-icon">✈</div>
+                    <div class="tg-info">
+                        <h4 id="tgTitle">Join Community Feed Channel</h4>
+                        <p>Get immediate updates, live restoration triggers, and mirror URLs.</p>
+                    </div>
+                </div>
+                <a href="#" id="tgBtn" class="tg-action-btn" target="_blank">Connect via Telegram</a>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { db } from './assets/js/db.js';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('id');
+
+        let activeStreamUrl = "";
+        let activeStreamType = "";
+        let hlsInstance = null;
+        let shakaPlayerInstance = null;
+
+        const vid = document.getElementById('vid');
+        const loadingBox = document.getElementById('loadingBox');
+        const errorBox = document.getElementById('errorBox');
+        const qualityDropdownMenu = document.getElementById('qualityDropdownMenu');
+        const currentQualityLabel = document.getElementById('currentQualityLabel');
+
+        if (!matchId) {
+            triggerInterfaceError("NO DATA TOKEN FOUND", "Please navigate through the main index interface to open a verified broadcast.");
+        } else {
+            const fetchAndPlay = async () => {
+                const match = await db.getMatchById(matchId);
+                if (!match) {
+                    triggerInterfaceError("BROADCAST DEACTIVATED", "This match directory has been checked out or closed down by the system admin.");
+                } else {
+                    // Populate UI Data Points
+                    document.getElementById('pageTitle').textContent = match.title;
+                    document.getElementById('pageSub').textContent = match.subtitle || "Live Event";
+                    document.getElementById('tgBtn').href = match.tgUrl || "https://t.me/";
+                    document.getElementById('tgTitle').textContent = `Join ${match.tgName || 'Our Telegram'}`;
+                    document.title = `${match.title} | StreamLive`;
+
+                    activeStreamUrl = match.streamUrl;
+                    activeStreamType = match.streamType;
+
+                    // Fire initial engine build loop
+                    initStream(activeStreamUrl, activeStreamType);
+                }
+            };
+            fetchAndPlay();
+        }
+
+        function triggerInterfaceError(heading, message) {
+            loadingBox.style.display = 'none';
+            errorBox.style.display = 'flex';
+            errorBox.querySelector('h3').textContent = heading;
+            document.getElementById('errorTxt').textContent = message;
+        }
+
+        // ── Stream Decoupling & DRM Core Engine ──
+        function initStream(url, type) {
+            // Reset existing engine instances gracefully
+            if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+            if (shakaPlayerInstance) { shakaPlayerInstance.destroy(); shakaPlayerInstance = null; }
+            vid.src = "";
+            qualityDropdownMenu.innerHTML = "";
+            currentQualityLabel.textContent = "Auto";
+            loadingBox.style.display = 'flex';
+            errorBox.style.display = 'none';
+
+            let finalUrl = url.trim();
+            let clearKeysObj = null;
+
+            if (finalUrl.includes('|')) {
+                const parts = finalUrl.split('|');
+                finalUrl = parts[0];
+                const queryParams = new URLSearchParams(parts[1]);
+                const drmScheme = queryParams.get('drmScheme');
+                const drmLicense = queryParams.get('drmLicense');
+
+                if (drmScheme === 'clearkey' && drmLicense && drmLicense.includes(':')) {
+                    const licenseParts = drmLicense.split(':');
+                    clearKeysObj = { [licenseParts[0]]: licenseParts[1] };
+                }
+            }
+
+            const isDash = finalUrl.includes('.mpd') || type === 'dash';
+
+            if (isDash) {
+                shaka.polyfill.installAll();
+                shakaPlayerInstance = new shaka.Player(vid);
+                
+                // Resilient DASH Configuration
+                const shakaConfig = {
+                    streaming: {
+                        bufferingGoal: 30,      
+                        rebufferingGoal: 5,     
+                        bufferBehind: 30,
+                        jumpLargeGaps: true     // Skip corrupted frames
+                    },
+                    manifest: {
+                        dash: { ignoreMinBufferTime: true }
+                    }
+                };
+
+                if (clearKeysObj) {
+                    shakaConfig.drm = { clearKeys: clearKeysObj };
+                }
+
+                shakaPlayerInstance.configure(shakaConfig);
+
+                shakaPlayerInstance.load(finalUrl).then(() => {
+                    loadingBox.style.display = 'none';
+                    buildShakaQualityMenu();
+                    vid.play().catch(() => {});
+                }).catch(e => {
+                    console.error("Shaka Failure: ", e);
+                    triggerInterfaceError("STREAM OR KEY EXPIRED", "The feed is offline, segments are missing, or the DRM keys have rotated.");
+                });
+
+            } else if (Hls.isSupported()) {
+                // Resilient HLS Configuration
+                hlsInstance = new Hls({
+                    maxBufferLength: 20,       
+                    maxMaxBufferLength: 40,
+                    startLevel: -1,            
+                    liveSyncDurationCount: 5,  
+                    enableWorker: true         
+                });
+                
+                hlsInstance.loadSource(finalUrl);
+                hlsInstance.attachMedia(vid);
+
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                    loadingBox.style.display = 'none';
+                    buildHlsQualityMenu();
+                    vid.play().catch(() => {});
+                });
+
+                // Auto-Recovery Logic
+                hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) {
+                        switch (data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                console.log("Network error, recovering...");
+                                hlsInstance.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log("Media error, recovering...");
+                                hlsInstance.recoverMediaError();
+                                break;
+                            default:
+                                triggerInterfaceError("FEED INSTABILITY DETECTED", "Connection to target server manifest dropped unexpectedly.");
+                                break;
+                        }
+                    }
+                });
+            } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                vid.src = finalUrl;
+                vid.addEventListener('loadedmetadata', () => { 
+                    loadingBox.style.display = 'none'; 
+                    vid.play().catch(()=>{});
+                });
+            } else {
+                triggerInterfaceError("PLAYER INCOMPATIBILITY", "This client browser layer lacks core engine decoding capabilities for HLS/DASH pipelines.");
+            }
+        }
+
+        // ── Custom Dynamic Quality Injectors ──
+        function buildHlsQualityMenu() {
+            if (!hlsInstance) return;
+            const levels = hlsInstance.levels;
+            
+            let html = `<button class="quality-opt active" id="opt-auto">Auto</button>`;
+            levels.forEach((level, index) => {
+                const label = level.height ? `${level.height}p` : `Track ${index}`;
+                html += `<button class="quality-opt" data-index="${index}">${label}</button>`;
+            });
+            qualityDropdownMenu.innerHTML = html;
+
+            setupQualityClicks((target) => {
+                const idx = target.getAttribute('data-index');
+                if (idx === null) {
+                    hlsInstance.currentLevel = -1; // Auto
+                    currentQualityLabel.textContent = "Auto";
+                } else {
+                    hlsInstance.currentLevel = parseInt(idx);
+                    currentQualityLabel.textContent = levels[idx].height + "p";
+                }
+            });
+        }
+
+        function buildShakaQualityMenu() {
+            if (!shakaPlayerInstance) return;
+            const tracks = shakaPlayerInstance.getVariantTracks().filter(t => t.height);
+            // Deduplicate heights
+            const uniqueTracks = [];
+            const map = new Map();
+            for (const item of tracks) {
+                if(!map.has(item.height)){
+                    map.set(item.height, true);
+                    uniqueTracks.push(item);
+                }
+            }
+            uniqueTracks.sort((a,b) => b.height - a.height);
+
+            let html = `<button class="quality-opt active" id="opt-auto">Auto</button>`;
+            uniqueTracks.forEach(track => {
+                html += `<button class="quality-opt" data-id="${track.id}" data-height="${track.height}">${track.height}p</button>`;
+            });
+            qualityDropdownMenu.innerHTML = html;
+
+            setupQualityClicks((target) => {
+                const trackId = target.getAttribute('data-id');
+                if (!trackId) {
+                    shakaPlayerInstance.configure({ abr: { enabled: true } });
+                    currentQualityLabel.textContent = "Auto";
+                } else {
+                    shakaPlayerInstance.configure({ abr: { enabled: false } });
+                    const selectedTrack = uniqueTracks.find(t => t.id == trackId);
+                    shakaPlayerInstance.selectVariantTrack(selectedTrack, true);
+                    currentQualityLabel.textContent = target.getAttribute('data-height') + "p";
+                }
+            });
+        }
+
+        function setupQualityClicks(callback) {
+            const options = qualityDropdownMenu.querySelectorAll('.quality-opt');
+            options.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    options.forEach(o => o.classList.remove('active'));
+                    e.target.classList.add('active');
+                    callback(e.target);
+                    qualityDropdownMenu.classList.remove('show');
+                });
+            });
+        }
+
+        // ── Native Controls Overlay Action Listeners ──
+        document.getElementById('playPauseBtn').addEventListener('click', (e) => {
+            if (vid.paused) {
+                vid.play();
+                e.target.textContent = "⏸";
+            } else {
+                vid.pause();
+                e.target.textContent = "▶";
+            }
+        });
+
+        document.getElementById('muteBtn').addEventListener('click', (e) => {
+            vid.muted = !vid.muted;
+            e.target.textContent = vid.muted ? "🔇" : "🔊";
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', () => {
+            const container = document.querySelector('.player-stage');
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) container.requestFullscreen();
+                else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Toggle Quality Selector Sub-menu Visibility
+        document.getElementById('qualityMenuBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            qualityDropdownMenu.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside anywhere on document
+        document.addEventListener('click', () => {
+            qualityDropdownMenu.classList.remove('show');
+        });
+
+        // 🔄 Instant Reconnect Feature execution logic
+        document.getElementById('refreshStreamBtn').addEventListener('click', () => {
+            if (activeStreamUrl) {
+                console.log("Reinitializing live video pipeline...");
+                initStream(activeStreamUrl, activeStreamType);
+            }
+        });
+
+        // Sync control play icon state if video triggers play natively
+        vid.addEventListener('play', () => { document.getElementById('playPauseBtn').textContent = "⏸"; });
+        vid.addEventListener('pause', () => { document.getElementById('playPauseBtn').textContent = "▶"; });
+    </script>
+</body>
+</html>

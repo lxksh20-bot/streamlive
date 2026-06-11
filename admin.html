@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — StreamLive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background:#050505; color:#fff; font-family:'Rajdhani', sans-serif; padding: 20px; }
+        .card { background:#0d0d0d; border:1px solid #1a1a1a; border-radius:16px; padding:26px; max-width: 600px; margin: 0 auto; }
+        .field { margin-bottom: 15px; }
+        label { display:block; font-size:0.8rem; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:5px; }
+        input, select { width:100%; background:#111; border:1px solid #333; color:#fff; padding:12px; border-radius:8px; font-family:'Rajdhani'; outline:none; }
+        button { width: 100%; padding: 15px; background: #ff4444; color: #fff; border: none; border-radius: 8px; font-family: 'Teko'; font-size: 1.5rem; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #cc2222; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2 style="font-family:'Teko'; font-size: 2rem; margin-bottom: 20px;">PUBLISH NEW MATCH</h2>
+        
+        <form id="matchForm">
+            <div class="field">
+                <label>Match Title</label>
+                <input type="text" id="title" placeholder="e.g. India vs Pakistan" required>
+            </div>
+            <div class="field">
+                <label>Tournament / Info</label>
+                <input type="text" id="subtitle" placeholder="e.g. T20 World Cup">
+            </div>
+            <div class="field">
+                <label>Stream URL (M3U8 / MPD)</label>
+                <input type="text" id="streamUrl" required>
+            </div>
+            <div class="field">
+                <label>Stream Type</label>
+                <select id="streamType">
+                    <option value="auto">Auto Detect</option>
+                    <option value="hls">HLS (m3u8)</option>
+                    <option value="dash">DASH (mpd)</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Telegram Channel Name</label>
+                <input type="text" id="tgName" value="LXKSH BOT">
+            </div>
+            <div class="field">
+                <label>Telegram Link</label>
+                <input type="text" id="tgUrl" value="https://t.me/+x2z1kIkmW9M0ZTkx">
+            </div>
+            
+            <button type="submit">⚡ PUBLISH MATCH</button>
+        </form>
+    </div>
+
+   <script type="module">
+        import { db } from './assets/js/db.js';
+
+        // Notice the word 'async' added right before (e) =>
+        document.getElementById('matchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const matchData = {
+                title: document.getElementById('title').value,
+                subtitle: document.getElementById('subtitle').value,
+                streamUrl: document.getElementById('streamUrl').value,
+                streamType: document.getElementById('streamType').value,
+                tgName: document.getElementById('tgName').value,
+                tgUrl: document.getElementById('tgUrl').value,
+                status: 'live'
+            };
+
+            try {
+                // Now the 'await' will work perfectly
+                const newId = await db.saveMatch(matchData);
+                alert(`Match published successfully!\nID: ${newId}`);
+                
+                // Redirect to the match page to view it
+                window.location.href = `match.html?id=${newId}`;
+            } catch (error) {
+                console.error("Error saving match: ", error);
+                alert("Failed to save. Check the F12 Console for details.");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamLive — Live Sports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background:#000; color:#fff; font-family:'Rajdhani', sans-serif; text-align: center; padding: 50px 20px; }
+        .logo { font-family:'Teko'; font-size: 4rem; letter-spacing: 3px; line-height: 1; margin-bottom: 40px; }
+        .logo span { color: #ff4444; }
+        .grid { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        .match-card { display: block; background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 12px; text-decoration: none; color: #fff; text-align: left; transition: transform 0.2s; }
+        .match-card:hover { transform: translateY(-3px); border-color: #333; }
+        .live-badge { color: #ff4444; font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; }
+        .m-title { font-family: 'Teko'; font-size: 1.8rem; margin: 5px 0; }
+        .m-sub { color: #888; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="logo">STREAM<span>LIVE</span></div>
+    
+    <div class="grid" id="matchList">
+        </div>
+
+    <script type="module">
+        import { db } from './assets/js/db.js';
+
+        const matches = await db.getMatches();
+        const container = document.getElementById('matchList');
+
+        if (matches.length === 0) {
+            container.innerHTML = '<p style="color:#555;">No matches currently live.</p>';
+        } else {
+            // Loop through matches and create HTML
+            matches.forEach(match => {
+                if(match.status === 'live') {
+                    const card = document.createElement('a');
+                    card.href = `match.html?id=${match.id}`;
+                    card.className = 'match-card';
+                    card.innerHTML = `
+                        <div class="live-badge">● LIVE NOW</div>
+                        <div class="m-title">${match.title}</div>
+                        <div class="m-sub">${match.subtitle}</div>
+                    `;
+                    container.appendChild(card);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

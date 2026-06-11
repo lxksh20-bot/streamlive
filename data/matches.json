@@ -1,0 +1,34 @@
+[
+  {
+    "id": "m_1x9a8b7c",
+    "title": "India vs Pakistan",
+    "tournament": "T20 World Cup",
+    "subtitle": "Group Stage",
+    "sport": "Cricket",
+    "streamUrl": "https://example.com/live/cricket/master.m3u8",
+    "streamType": "hls",
+    "licenseUrl": "",
+    "clearKeyId": "",
+    "clearKeyVal": "",
+    "tgName": "LXKSH BOT",
+    "tgUrl": "https://t.me/+x2z1kIkmW9M0ZTkx",
+    "status": "live",
+    "createdAt": "2026-06-11T14:30:00.000Z"
+  },
+  {
+    "id": "m_5y4z3x2w",
+    "title": "2026 Chinese GP",
+    "tournament": "F1 Live",
+    "subtitle": "Practice 1",
+    "sport": "Formula 1",
+    "streamUrl": "https://sonydaimenew.akamaized.net/.../cenc.mpd",
+    "streamType": "dash",
+    "licenseUrl": "https://widevine-proxy.example.com/license",
+    "clearKeyId": "a12a987fe725a40b6be95cd84b15f689",
+    "clearKeyVal": "e51aa21f2a0fef9aabc120dfb655b52f",
+    "tgName": "LXKSH BOT",
+    "tgUrl": "https://t.me/+x2z1kIkmW9M0ZTkx",
+    "status": "live",
+    "createdAt": "2026-06-11T16:45:00.000Z"
+  }
+]
