@@ -77,6 +77,20 @@
         /* Spinner animation */
         .spinner { border: 3px solid rgba(255, 68, 68, 0.1); border-radius: 50%; border-top: 3px solid #ff4444; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* Mobile Optimization for Player Page */
+        @media (max-width: 768px) {
+            .container { padding: 12px; }
+            .nav-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .match-meta { flex-direction: column; align-items: flex-start; padding: 16px; }
+            .m-title { font-size: 1.8rem; }
+            .m-sub { font-size: 0.95rem; }
+            
+            /* Stack player controls on tiny screens */
+            .player-controls { padding: 12px; flex-wrap: wrap; gap: 12px; }
+            .ctrl-left { width: 100%; justify-content: space-between; }
+            .ctrl-right { width: 100%; justify-content: flex-end; }
+            .tg-banner { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -115,7 +129,7 @@
                 <div class="player-controls" id="customControls">
                     <div class="ctrl-left">
                         <button class="ctrl-btn" id="playPauseBtn" title="Play/Pause">⏸</button>
-                        <button class="ctrl-btn" id="muteBtn" title="Mute/Unmute">🔊</button>
+                        <button class="ctrl-btn" id="muteBtn" title="Mute/Unmute">🔇</button>
                         <div class="live-indicator">
                             <div class="pulse-dot"></div>
                             <span>LIVE</span>
@@ -393,6 +407,9 @@
                 e.target.textContent = "▶";
             }
         });
+
+        // 💥 Sync initial state on load so the button isn't lying
+        document.getElementById('muteBtn').textContent = vid.muted ? "🔇" : "🔊";
 
         document.getElementById('muteBtn').addEventListener('click', (e) => {
             vid.muted = !vid.muted;
