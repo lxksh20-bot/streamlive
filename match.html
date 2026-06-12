@@ -77,77 +77,68 @@
         /* Spinner animation */
         .spinner { border: 3px solid rgba(255, 68, 68, 0.1); border-radius: 50%; border-top: 3px solid #ff4444; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    /* 📱 Ultimate Mobile Optimization Overhaul */
+    /* 📱 Mobile Optimization - Clean & Native Look */
         @media (max-width: 768px) {
-            /* 1. Reduce overall layout spacing */
-            body { padding: 10px 5px; }
-            .container { padding: 8px; margin-top: 5px; }
+            body { padding: 0; }
+            .container { padding: 12px; margin-top: 0; }
             
-            /* 2. Compact Navigation Header */
+            /* 1. Header: Back to the old, clean horizontal layout */
             .nav-header { 
-                flex-direction: column; 
+                flex-direction: row; 
                 align-items: center; 
-                gap: 10px; 
-                padding: 10px;
-                text-align: center;
+                justify-content: space-between; 
+                margin-bottom: 16px; 
             }
-            .nav-logo { font-size: 2.2rem; }
-            .btn-back { width: 100%; text-align: center; justify-content: center; }
+            .brand-logo { font-size: 1.8rem; }
+            .back-btn { padding: 6px 12px; font-size: 0.85rem; }
 
-            /* 3. Re-scale the Video Stage to preserve 16:9 aspect ratio */
+            /* 2. Video Player: Native 16:9 look */
             .player-stage { 
-                border-radius: 8px; 
-                margin-bottom: 12px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                border-radius: 12px; 
+                margin-bottom: 15px;
             }
 
-            /* 4. Fix Control Bar Overlaps (Change layout to wrapping rows) */
+            /* 3. Controls: Forced to stay on ONE single line! */
             .player-controls { 
-                padding: 10px; 
-                flex-wrap: wrap; 
-                gap: 10px; 
-                justify-content: space-between;
+                padding: 12px 10px; 
+                flex-wrap: nowrap; /* This stops the Quality button from jumping to the center */
+                gap: 5px; 
             }
             .ctrl-left, .ctrl-right { 
-                width: 100%; 
-                justify-content: space-between; 
-                gap: 8px;
+                width: auto; 
+                gap: 8px; 
             }
-            /* Make key control buttons slightly larger for thumb taps */
+            
+            /* Shrink buttons slightly so they all fit on tiny iPhone screens */
             .ctrl-btn { 
-                padding: 6px 12px; 
-                font-size: 1rem; 
+                width: 32px; 
+                height: 32px; 
+                font-size: 1.1rem; 
             }
+            .quality-select-btn {
+                padding: 4px 8px;
+                font-size: 0.85rem;
+            }
+            .quality-dropdown { bottom: 45px; } /* Push menu up so thumb doesn't block it */
 
-            /* 5. Clean Meta Info Stacking */
+            /* 4. Match Info Box */
             .match-meta { 
                 flex-direction: column; 
                 align-items: flex-start; 
-                padding: 15px; 
+                padding: 16px; 
                 gap: 12px;
-                border-radius: 8px;
             }
-            .meta-left { width: 100%; }
-            .m-title { font-size: 1.8rem; line-height: 1.2; }
-            .m-sub { font-size: 0.95rem; }
+            .m-title { font-size: 1.6rem; }
             
-            /* Push Telegram button to full-width block */
-            .tg-btn-meta { 
-                width: 100%; 
-                text-align: center; 
-                justify-content: center; 
-                padding: 12px;
-            }
-
-            /* 6. Footer Telegram Channel Banner Adjustments */
+            /* 5. Telegram Banner */
             .tg-banner { 
                 flex-direction: column; 
                 text-align: center; 
                 padding: 15px; 
-                gap: 14px; 
-                border-radius: 8px;
+                gap: 15px;
             }
-            .tg-banner-btn { width: 100%; justify-content: center; }
+            .tg-left { flex-direction: column; gap: 8px; }
+            .tg-action-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
