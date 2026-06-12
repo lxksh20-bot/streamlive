@@ -1,88 +1,486 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin — StreamLive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { background:#050505; color:#fff; font-family:'Rajdhani', sans-serif; padding: 20px; }
-        .card { background:#0d0d0d; border:1px solid #1a1a1a; border-radius:16px; padding:26px; max-width: 600px; margin: 0 auto; }
-        .field { margin-bottom: 15px; }
-        label { display:block; font-size:0.8rem; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:5px; }
-        input, select { width:100%; background:#111; border:1px solid #333; color:#fff; padding:12px; border-radius:8px; font-family:'Rajdhani'; outline:none; }
-        button { width: 100%; padding: 15px; background: #ff4444; color: #fff; border: none; border-radius: 8px; font-family: 'Teko'; font-size: 1.5rem; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #cc2222; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — StreamLive</title>
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* [KEEP YOUR EXACT SAME CSS STYLES HERE. I HAVE ONLY TRUNCATED THIS IN THE CHAT TO SAVE SPACE, BUT KEEP YOUR BEAUTIFUL CSS!] */
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#050505;color:#fff;font-family:'Rajdhani',sans-serif;min-height:100%;}
+#loginScreen{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;padding:20px;}
+#loginScreen.hide{display:none;}
+.login-box{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:20px;padding:44px 36px 36px;max-width:360px;width:100%;text-align:center;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.9);animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.login-bar{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff4444,#ff8c42,#ff4444);background-size:200%;animation:sh 2s linear infinite;}
+@keyframes sh{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.login-icon{font-size:2.8rem;margin-bottom:16px;}
+.login-title{font-family:'Teko',sans-serif;font-size:1.8rem;letter-spacing:3px;color:#fff;margin-bottom:4px;}
+.login-sub{font-size:0.78rem;color:rgba(255,255,255,0.25);letter-spacing:2px;text-transform:uppercase;margin-bottom:32px;}
+.login-field{margin-bottom:14px;text-align:left;}
+.login-field label{display:block;font-size:0.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:7px;}
+.login-input{width:100%;background:#111;border:1px solid #222;color:#fff;padding:13px 16px;border-radius:10px;font-family:'Rajdhani',sans-serif;font-size:1rem;outline:none;transition:border-color 0.2s;letter-spacing:1px;}
+.login-input:focus{border-color:#ff4444;box-shadow:0 0 0 3px rgba(255,68,68,0.1);}
+.login-btn{width:100%;margin-top:8px;padding:15px;background:linear-gradient(135deg,#ff4444,#cc2222);color:#fff;border:none;border-radius:10px;font-family:'Teko',sans-serif;font-size:1.2rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 6px 24px rgba(255,68,68,0.25);}
+.login-btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,68,68,0.35);}
+.login-err{margin-top:12px;padding:10px;background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.2);border-radius:8px;color:#ff8888;font-size:0.8rem;font-weight:600;letter-spacing:0.5px;display:none;}
+.login-err.show{display:block;}
+.login-hint{margin-top:20px;font-size:0.68rem;color:rgba(255,255,255,0.12);letter-spacing:1px;line-height:1.6;}
+.login-hint strong{color:rgba(255,255,255,0.25);}
+#adminPanel{display:none;}
+#adminPanel.show{display:block;}
+.top-bar{background:#000;border-bottom:1px solid #111;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:100;}
+.admin-logo{font-family:'Teko',sans-serif;font-size:1.6rem;letter-spacing:3px;}
+.admin-logo span{color:#ff4444;}
+.top-right{display:flex;align-items:center;gap:10px;}
+.user-chip{background:#111;border:1px solid #1a1a1a;padding:6px 14px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);}
+.logout-btn{background:transparent;border:1px solid #222;color:rgba(255,255,255,0.3);padding:6px 14px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:0.78rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.logout-btn:hover{border-color:#ff4444;color:#ff6666;}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 60px;}
+.tabs{display:flex;gap:4px;background:#0a0a0a;border:1px solid #111;border-radius:12px;padding:4px;margin-bottom:24px;}
+.tab{flex:1;padding:10px;border:none;background:transparent;color:rgba(255,255,255,0.35);font-family:'Rajdhani',sans-serif;font-size:0.88rem;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:9px;transition:all 0.2s;text-transform:uppercase;}
+.tab.active{background:#111;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:16px;padding:26px;margin-bottom:18px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ff4444,#ff8c42);}
+.card.teal::before{background:linear-gradient(90deg,#00c9a7,#229ed9);}
+.card-title{font-family:'Teko',sans-serif;font-size:1.1rem;letter-spacing:2px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:0.67rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:#080808;border:1px solid #1e1e1e;color:#fff;padding:11px 14px;border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:0.93rem;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#ff4444;box-shadow:0 0 0 2px rgba(255,68,68,0.08);}
+.field select option{background:#111;}
+.hint{font-size:0.7rem;color:#282828;margin-top:5px;letter-spacing:0.5px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:520px){.row2{grid-template-columns:1fr;}}
+.sport-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:4px;}
+.sport-btn{background:#080808;border:1px solid #1e1e1e;border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all 0.2s;color:rgba(255,255,255,0.4);}
+.sport-btn:hover{border-color:#333;color:#fff;}
+.sport-btn.selected{background:rgba(255,68,68,0.08);border-color:rgba(255,68,68,0.4);color:#ff8888;}
+.sport-btn .si{font-size:1.4rem;display:block;margin-bottom:4px;}
+.sport-btn .sn{font-size:0.65rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;}
+.toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.tgl-lbl{font-size:0.78rem;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.35);text-transform:uppercase;}
+.toggle{position:relative;width:42px;height:23px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;background:#1a1a1a;border-radius:23px;transition:background 0.2s;}
+.slider::before{content:'';position:absolute;width:17px;height:17px;left:3px;top:3px;background:#444;border-radius:50%;transition:transform 0.2s,background 0.2s;}
+.toggle input:checked+.slider{background:rgba(255,68,68,0.25);}
+.toggle input:checked+.slider::before{transform:translateX(19px);background:#ff4444;}
+.drm-fields{display:none;}
+.drm-fields.show{display:block;}
+.etype-btn{flex:1;padding:9px 10px;background:#080808;border:1px solid #1e1e1e;color:rgba(255,255,255,0.3);border-radius:9px;font-family:'Rajdhani',sans-serif;font-size:0.82rem;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;}
+.etype-btn:hover{border-color:#333;color:#fff;}
+.etype-btn.active{background:rgba(255,68,68,0.08);border-color:rgba(255,68,68,0.35);color:#ff8888;}
+.gen-btn{width:100%;padding:17px;background:linear-gradient(135deg,#ff4444,#cc2222);color:#fff;border:none;border-radius:12px;font-family:'Teko',sans-serif;font-size:1.3rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 6px 30px rgba(255,68,68,0.2);margin-bottom:20px;}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,68,68,0.3);}
+.page-item{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;padding:13px 16px;margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.pi-left{}
+.pi-sport{font-size:1.1rem;margin-right:6px;}
+.pi-name{font-weight:700;font-size:0.92rem;color:#fff;}
+.pi-file{font-family:monospace;font-size:0.72rem;color:#229ed9;margin-top:2px;}
+.pi-btns{display:flex;gap:7px;}
+.pi-btn{padding:5px 13px;border-radius:6px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.72rem;letter-spacing:1px;cursor:pointer;border:1px solid;transition:all 0.2s;}
+.pi-del{background:transparent;border-color:rgba(255,68,68,0.25);color:#ff6666;}
+.pi-del:hover{background:rgba(255,68,68,0.08);}
+.empty{color:rgba(255,255,255,0.15);font-size:0.82rem;text-align:center;padding:30px;letter-spacing:1px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;border-bottom:1px solid #111;flex-wrap:wrap;}
+.setting-row:last-child{border-bottom:none;}
+.setting-info strong{display:block;font-size:0.9rem;font-weight:700;color:#fff;margin-bottom:3px;}
+.setting-info span{font-size:0.78rem;color:rgba(255,255,255,0.3);}
+.setting-input{background:#080808;border:1px solid #1e1e1e;color:#fff;padding:9px 12px;border-radius:8px;font-family:'Rajdhani',sans-serif;font-size:0.88rem;outline:none;width:200px;transition:border-color 0.2s;}
+.setting-input:focus{border-color:#ff4444;}
+.save-settings-btn{width:100%;margin-top:20px;padding:14px;background:#111;border:1px solid #222;color:rgba(255,255,255,0.6);border-radius:10px;font-family:'Teko',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;}
+.save-settings-btn:hover{border-color:#ff4444;color:#ff8888;}
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <h2 style="font-family:'Teko'; font-size: 2rem; margin-bottom: 20px;">PUBLISH NEW MATCH</h2>
-        
-        <form id="matchForm">
-            <div class="field">
-                <label>Match Title</label>
-                <input type="text" id="title" placeholder="e.g. India vs Pakistan" required>
-            </div>
-            <div class="field">
-                <label>Tournament / Info</label>
-                <input type="text" id="subtitle" placeholder="e.g. T20 World Cup">
-            </div>
-            <div class="field">
-                <label>Stream URL (M3U8 / MPD)</label>
-                <input type="text" id="streamUrl" required>
-            </div>
-            <div class="field">
-                <label>Stream Type</label>
-                <select id="streamType">
-                    <option value="auto">Auto Detect</option>
-                    <option value="hls">HLS (m3u8)</option>
-                    <option value="dash">DASH (mpd)</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>Telegram Channel Name</label>
-                <input type="text" id="tgName" value="LXKSH BOT">
-            </div>
-            <div class="field">
-                <label>Telegram Link</label>
-                <input type="text" id="tgUrl" value="https://t.me/+x2z1kIkmW9M0ZTkx">
-            </div>
-            
-            <button type="submit">⚡ PUBLISH MATCH</button>
-        </form>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-bar"></div>
+    <div class="login-icon">🔐</div>
+    <div class="login-title">ADMIN PANEL</div>
+    <div class="login-sub">StreamLive · Restricted Access</div>
+
+    <div class="login-field">
+      <label>Username</label>
+      <input class="login-input" id="loginUser" type="text" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input class="login-input" id="loginPass" type="password" placeholder="Enter password" autocomplete="off">
     </div>
 
-   <script type="module">
-        import { db } from './assets/js/db.js';
+    <div class="login-err" id="loginErr">❌ Wrong username or password</div>
+    <button class="login-btn" id="loginBtnTrigger">🔓 Login</button>
 
-        // Notice the word 'async' added right before (e) =>
-        document.getElementById('matchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+    <div class="login-hint">
+      Default credentials:<br>
+      <strong>Username: admin &nbsp;·&nbsp; Password: stream123</strong><br>
+      Change these in Settings after login.
+    </div>
+  </div>
+</div>
 
-            const matchData = {
-                title: document.getElementById('title').value,
-                subtitle: document.getElementById('subtitle').value,
-                streamUrl: document.getElementById('streamUrl').value,
-                streamType: document.getElementById('streamType').value,
-                tgName: document.getElementById('tgName').value,
-                tgUrl: document.getElementById('tgUrl').value,
-                status: 'live'
-            };
+<div id="adminPanel">
 
-            try {
-                // Now the 'await' will work perfectly
-                const newId = await db.saveMatch(matchData);
-                alert(`Match published successfully!\nID: ${newId}`);
-                
-                // Redirect to the match page to view it
-                window.location.href = `match.html?id=${newId}`;
-            } catch (error) {
-                console.error("Error saving match: ", error);
-                alert("Failed to save. Check the F12 Console for details.");
+  <div class="top-bar">
+    <div class="admin-logo">Stream<span>Live</span> Admin</div>
+    <div class="top-right">
+      <div class="user-chip" id="userChip">👤 admin</div>
+      <button class="logout-btn" id="logoutBtnTrigger">Logout</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="tabs">
+      <button class="tab active" data-tab="create">➕ Publish Live</button>
+      <button class="tab" data-tab="pages">📄 Live Matches</button>
+      <button class="tab" data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <div class="tab-content active" id="tab-create">
+
+      <div class="card">
+        <div class="card-title">🏆 Select Sport</div>
+        <div class="sport-grid" id="sportGrid">
+          <div class="sport-btn selected" data-sport="Cricket"><span class="si">🏏</span><span class="sn">Cricket</span></div>
+          <div class="sport-btn" data-sport="Football"><span class="si">⚽</span><span class="sn">Football</span></div>
+          <div class="sport-btn" data-sport="Basketball"><span class="si">🏀</span><span class="sn">Basketball</span></div>
+          <div class="sport-btn" data-sport="Tennis"><span class="si">🎾</span><span class="sn">Tennis</span></div>
+          <div class="sport-btn" data-sport="Hockey"><span class="si">🏒</span><span class="sn">Hockey</span></div>
+          <div class="sport-btn" data-sport="American Football"><span class="si">🏈</span><span class="sn">NFL</span></div>
+          <div class="sport-btn" data-sport="MMA / Boxing"><span class="si">🥊</span><span class="sn">MMA</span></div>
+          <div class="sport-btn" data-sport="Formula 1"><span class="si">🏎️</span><span class="sn">F1</span></div>
+          <div class="sport-btn" data-sport="Baseball"><span class="si">⚾</span><span class="sn">Baseball</span></div>
+          <div class="sport-btn" data-sport="Rugby"><span class="si">🏉</span><span class="sn">Rugby</span></div>
+          <div class="sport-btn" data-sport="Kabaddi"><span class="si">🤼</span><span class="sn">Kabaddi</span></div>
+          <div class="sport-btn" data-sport="Other"><span class="si">🎯</span><span class="sn">Other</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Event Details</div>
+
+        <div style="display:flex;gap:6px;margin-bottom:18px;">
+          <button class="etype-btn active" id="btnVs" data-type="vs">⚔️ Team vs Team</button>
+          <button class="etype-btn" id="btnSingle" data-type="single">🏆 Single Event</button>
+        </div>
+
+        <div id="vsMode">
+          <div class="row2">
+            <div class="field">
+              <label>Team / Player 1</label>
+              <input type="text" id="team1" placeholder="India">
+            </div>
+            <div class="field">
+              <label>Team / Player 2</label>
+              <input type="text" id="team2" placeholder="Pakistan">
+            </div>
+          </div>
+        </div>
+
+        <div id="singleMode" style="display:none;">
+          <div class="field">
+            <label>Event Name</label>
+            <input type="text" id="eventName" placeholder="F1 Monaco Grand Prix 2025">
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label>Tournament / League <span style="color:#333;font-weight:400;">(optional)</span></label>
+            <input type="text" id="tournament" placeholder="T20 World Cup">
+          </div>
+          <div class="field">
+            <label>Extra Info <span style="color:#333;font-weight:400;">(optional)</span></label>
+            <input type="text" id="matchinfo" placeholder="Group Stage">
+          </div>
+        </div>
+        
+        <div class="field">
+          <label>Poster / Thumbnail Image URL</label>
+          <input type="text" id="posterUrl" placeholder="https://example.com/poster.jpg">
+          <div class="hint">Paste an image link to show before the video plays.</div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="card-title">📡 Stream Settings</div>
+        <div class="field">
+          <label>Stream URL (M3U8 or MPD link)</label>
+          <input type="text" id="streamUrl" placeholder="https://example.com/stream.m3u8">
+        </div>
+        <div class="field">
+          <label>Stream Type</label>
+          <select id="streamType">
+            <option value="auto">Auto Detect (recommended)</option>
+            <option value="hls">HLS — M3U8 / M3U</option>
+            <option value="dash">DASH — MPD</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <label class="toggle">
+            <input type="checkbox" id="drmToggle">
+            <span class="slider"></span>
+          </label>
+          <span class="tgl-lbl">🔒 Stream is DRM / Widevine Protected</span>
+        </div>
+        <div class="drm-fields" id="drmFields">
+          <div class="field">
+            <label>Widevine License Server URL</label>
+            <input type="text" id="licenseUrl" placeholder="https://widevine.server.com/license">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>ClearKey ID (hex)</label>
+              <input type="text" id="clearKeyId" placeholder="a7e61c373e219033...">
+            </div>
+            <div class="field">
+              <label>ClearKey Value (hex)</label>
+              <input type="text" id="clearKeyVal" placeholder="3dbf3e9cf8038932...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✈️ Telegram</div>
+        <div class="row2">
+          <div class="field">
+            <label>Channel Link</label>
+            <input type="text" id="tgUrl" value="https://t.me/+x2z1kIkmW9M0ZTkx">
+          </div>
+          <div class="field">
+            <label>Channel Name</label>
+            <input type="text" id="tgName" value="LXKSH BOT">
+          </div>
+        </div>
+      </div>
+
+      <button class="gen-btn" id="publishBtn">⚡ PUBLISH TO CLOUD</button>
+
+    </div><div class="tab-content" id="tab-pages">
+      <div class="card teal">
+        <div class="card-title">📄 Live Matches in Cloud (<span id="pageCount">0</span>)</div>
+        <div id="pagesList">
+          <div class="empty">Loading database...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-settings">
+      <div class="card">
+        <div class="card-title">🔐 Change Local Login</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <strong>Username</strong>
+          </div>
+          <input class="setting-input" id="newUser" type="text" placeholder="New username">
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <strong>Password</strong>
+          </div>
+          <input class="setting-input" id="newPass" type="password" placeholder="New password">
+        </div>
+        <button class="save-settings-btn" id="saveCredsBtn">💾 Save Credentials</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { db } from './assets/js/db.js';
+
+  // --- UI STATE VARIABLES ---
+  let selectedSport = 'Cricket';
+  let eventType = 'vs';
+
+  // --- LOGIN LOGIC ---
+  function getCreds() {
+    return {
+      user: localStorage.getItem('sl_user') || 'admin',
+      pass: localStorage.getItem('sl_pass') || 'stream123'
+    };
+  }
+
+  document.getElementById('loginBtnTrigger').addEventListener('click', () => {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value;
+    const creds = getCreds();
+    if (u === creds.user && p === creds.pass) {
+      document.getElementById('loginScreen').classList.add('hide');
+      document.getElementById('adminPanel').classList.add('show');
+      document.getElementById('userChip').textContent = '👤 ' + u;
+      loadFirebaseMatches(); // Load cloud data on login
+    } else {
+      const err = document.getElementById('loginErr');
+      err.classList.add('show');
+      setTimeout(() => err.classList.remove('show'), 3000);
+    }
+  });
+
+  document.getElementById('logoutBtnTrigger').addEventListener('click', () => {
+    window.location.reload();
+  });
+
+  // --- TAB NAVIGATION ---
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      
+      e.target.classList.add('active');
+      const targetId = e.target.getAttribute('data-tab');
+      document.getElementById('tab-' + targetId).classList.add('active');
+
+      if(targetId === 'pages') loadFirebaseMatches();
+    });
+  });
+
+  // --- UI TOGGLES ---
+  document.querySelectorAll('.sport-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('selected'));
+      e.currentTarget.classList.add('selected');
+      selectedSport = e.currentTarget.getAttribute('data-sport');
+    });
+  });
+
+  document.querySelectorAll('.etype-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.etype-btn').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      eventType = e.currentTarget.getAttribute('data-type');
+      
+      document.getElementById('vsMode').style.display = eventType === 'vs' ? '' : 'none';
+      document.getElementById('singleMode').style.display = eventType === 'single' ? '' : 'none';
+    });
+  });
+
+  document.getElementById('drmToggle').addEventListener('change', (e) => {
+    document.getElementById('drmFields').className = 'drm-fields' + (e.target.checked ? ' show' : '');
+  });
+
+  // --- FIREBASE: PUBLISH MATCH ---
+  document.getElementById('publishBtn').addEventListener('click', async () => {
+    let title = '';
+    
+    if (eventType === 'vs') {
+      const t1 = document.getElementById('team1').value.trim();
+      const t2 = document.getElementById('team2').value.trim();
+      if (!t1 || !t2) return alert('Enter both team names!');
+      title = `${t1} vs ${t2}`;
+    } else {
+      title = document.getElementById('eventName').value.trim();
+      if (!title) return alert('Enter the event name!');
+    }
+
+    const streamUrl = document.getElementById('streamUrl').value.trim();
+    if (!streamUrl) return alert('Stream URL is required!');
+
+    // Build the data object
+    const matchData = {
+      sport: selectedSport,
+      title: title,
+      tournament: document.getElementById('tournament').value.trim(),
+      subtitle: document.getElementById('matchinfo').value.trim(),
+      posterUrl: document.getElementById('posterUrl').value.trim(), // 💥 NEW POSTER FIELD
+      streamUrl: streamUrl,
+      streamType: document.getElementById('streamType').value,
+      licenseUrl: document.getElementById('licenseUrl').value.trim(),
+      clearKeyId: document.getElementById('clearKeyId').value.trim(),
+      clearKeyVal: document.getElementById('clearKeyVal').value.trim(),
+      tgUrl: document.getElementById('tgUrl').value.trim(),
+      tgName: document.getElementById('tgName').value.trim(),
+      status: 'live'
+    };
+
+    const btn = document.getElementById('publishBtn');
+    btn.textContent = "⏳ PUBLISHING...";
+    
+    try {
+      const newId = await db.saveMatch(matchData);
+      alert(`✅ Match Published to Cloud!\nID: ${newId}`);
+      window.location.href = `match.html?id=${newId}`;
+    } catch (error) {
+      console.error(error);
+      alert("Database error. Check F12 console.");
+      btn.textContent = "⚡ PUBLISH TO CLOUD";
+    }
+  });
+
+  // --- FIREBASE: FETCH & DELETE MATCHES ---
+  async function loadFirebaseMatches() {
+    const listEl = document.getElementById('pagesList');
+    listEl.innerHTML = '<div class="empty">Fetching from Firebase...</div>';
+    
+    try {
+      const matches = await db.getMatches();
+      document.getElementById('pageCount').textContent = matches.length;
+
+      if (matches.length === 0) {
+        listEl.innerHTML = '<div class="empty">No live matches in database.</div>';
+        return;
+      }
+
+      let html = '';
+      matches.forEach(m => {
+        html += `
+          <div class="page-item">
+            <div class="pi-left">
+              <span class="pi-sport">🔴</span>
+              <span class="pi-name">${m.title}</span>
+              <div class="pi-file">${m.sport} &nbsp;·&nbsp; ID: ${m.id}</div>
+            </div>
+            <div class="pi-btns">
+              <button class="pi-btn pi-del delete-match-btn" data-id="${m.id}">🗑️ Delete</button>
+            </div>
+          </div>
+        `;
+      });
+      listEl.innerHTML = html;
+
+      // Attach delete listeners dynamically
+      document.querySelectorAll('.delete-match-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const matchId = e.currentTarget.getAttribute('data-id');
+          if (confirm("🚨 WARNING: Are you sure you want to permanently delete this match from the cloud?")) {
+            e.currentTarget.textContent = "⏳...";
+            const success = await db.deleteMatch(matchId);
+            if (success) {
+              loadFirebaseMatches(); // Refresh the list
+            } else {
+              alert("Failed to delete match.");
             }
+          }
         });
-    </script>
+      });
+
+    } catch (error) {
+      console.error(error);
+      listEl.innerHTML = '<div class="empty">Error loading matches.</div>';
+    }
+  }
+
+  // --- SAVE LOCAL SETTINGS ---
+  document.getElementById('saveCredsBtn').addEventListener('click', () => {
+    const u = document.getElementById('newUser').value.trim();
+    const p = document.getElementById('newPass').value;
+    if(u && p) {
+      localStorage.setItem('sl_user', u);
+      localStorage.setItem('sl_pass', p);
+      alert("Local credentials saved!");
+    }
+  });
+
+</script>
 </body>
 </html>
