@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+// 🚨 Look right here: We added onSnapshot to the end of this import
+import { getFirestore, collection, addDoc, getDocs, doc, getDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCQe6qeePsND7Wfp04BYGvflUS5TL3ywZo",
@@ -14,7 +15,15 @@ const app = initializeApp(firebaseConfig);
 const firestore = getFirestore(app);
 
 export const db = {
-    // Fetch all matches from the cloud
+    // 💥 NEW: Real-time listener for the home page
+    listenToMatches: (callback) => {
+        return onSnapshot(collection(firestore, "matches"), (snapshot) => {
+            const matches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            callback(matches);
+        });
+    },
+
+    // Fetch all matches from the cloud (Static one-time fetch)
     getMatches: async () => {
         const snapshot = await getDocs(collection(firestore, "matches"));
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
