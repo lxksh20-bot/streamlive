@@ -184,6 +184,9 @@
                     document.getElementById('tgTitle').textContent = `Join ${match.tgName || 'Our Telegram'}`;
                     document.title = `${match.title} | StreamLive`;
 
+                    // 💥 ADD THIS LINE TO SHOW THE THUMBNAIL:
+                    if (match.posterUrl) { document.getElementById('vid').poster = match.posterUrl; }
+
                     activeStreamUrl = match.streamUrl;
                     activeStreamType = match.streamType;
 
