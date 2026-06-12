@@ -92,10 +92,16 @@
                     ? `background-image: url('${match.posterUrl}');` 
                     : `background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%);`;
 
+                // Generate a random viewer count between 2,500 and 14,000
+                const viewers = Math.floor(Math.random() * (14000 - 2500 + 1)) + 2500;
+
                 card.innerHTML = `
                     <div class="card-thumb" style="${thumbStyle}"></div>
                     <div class="card-info">
-                        <div class="live-badge">LIVE NOW</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="live-badge">LIVE NOW</div>
+                            <div style="color:#aaa; font-size:0.85rem; font-weight:600;">👁 ${viewers.toLocaleString()}</div>
+                        </div>
                         <div class="m-title">${match.title}</div>
                         <div class="m-sub">${match.subtitle || match.tournament || 'Live Broadcast'}</div>
                     </div>
